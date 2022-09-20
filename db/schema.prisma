@@ -21,8 +21,11 @@ model User {
   hashedPassword String?
   role           String   @default("USER")
 
-  tokens   Token[]
-  sessions Session[]
+  tokens           Token[]
+  sessions         Session[]
+  reports          Report[]
+  places           Place[]
+  journeyTemplates JourneyTemplate[]
 }
 
 model Session {
@@ -63,3 +66,51 @@ model Token {
 // enum TokenType {
 //   RESET_PASSWORD
 // }
+
+model Report {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  name      String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int
+  Journey   Journey[]
+}
+
+model Place {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  address   String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId    Int
+}
+
+model JourneyTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String
+  from        String
+  to          String
+  distance    Int // Stored as tenths of a mile
+  tolls       Int // Stored as cents
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId      Int
+}
+
+model Journey {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  date        DateTime
+  description String
+  from        String
+  to          String
+  distance    Int // Stored as tenths of a mile
+  tolls       Int // Stored as cents
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reportId    Int
+}

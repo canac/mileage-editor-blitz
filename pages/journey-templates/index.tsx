@@ -1,13 +1,11 @@
 import { Suspense } from "react";
-import { Routes } from "@blitzjs/next";
 import Head from "next/head";
-import Link from "next/link";
 import { useMutation, usePaginatedQuery } from "@blitzjs/rpc";
 import { useRouter } from "next/router";
 import Layout from "app/core/layouts/Layout";
 import getJourneyTemplates from "app/journey-templates/queries/getJourneyTemplates";
-import { JourneyTemplateFormHorizontal } from "app/journey-templates/components/JourneyTemplateFormHorizontal";
-import { Button } from "@mantine/core";
+import { JourneyTemplateForm } from "app/journey-templates/components/JourneyTemplateForm";
+import { Button, Title } from "@mantine/core";
 import createJourneyTemplate from "app/journey-templates/mutations/createJourneyTemplate";
 
 const ITEMS_PER_PAGE = 100;
@@ -40,8 +38,12 @@ export const JourneyTemplatesList = () => {
 
   return (
     <div>
+      <Title order={1} style={{ textAlign: "center", marginBottom: "1em" }}>
+        Journey Templates
+      </Title>
+
       {journeyTemplates.map((journeyTemplate) => (
-        <JourneyTemplateFormHorizontal
+        <JourneyTemplateForm
           key={journeyTemplate.id}
           journeyTemplate={journeyTemplate}
           onDelete={() => refetch()}
@@ -75,16 +77,10 @@ const JourneyTemplatesPage = () => {
   return (
     <Layout>
       <Head>
-        <title>JourneyTemplates</title>
+        <title>Journey Templates</title>
       </Head>
 
       <div>
-        <p>
-          <Link href={Routes.NewJourneyTemplatePage()}>
-            <a>Create JourneyTemplate</a>
-          </Link>
-        </p>
-
         <Suspense fallback={<div>Loading...</div>}>
           <JourneyTemplatesList />
         </Suspense>

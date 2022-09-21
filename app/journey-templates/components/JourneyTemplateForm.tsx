@@ -1,7 +1,7 @@
 import { ActionIcon, NumberInput, TextInput } from "@mantine/core";
 import { faDollarSign, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaIcon } from "app/core/components/FaIcon";
-import { type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { UpdateJourneyTemplate } from "../validators/update";
 import updateJourneyTemplate from "../mutations/updateJourneyTemplate";
 import { useMutation } from "@blitzjs/rpc";
@@ -15,16 +15,26 @@ export type JourneyTemplateFormProps = {
 };
 
 export function JourneyTemplateForm(props: JourneyTemplateFormProps & { style?: CSSProperties }) {
-  const { journeyTemplate } = props;
+  const [journeyTemplate, setJourneyTemplate] = useState(props.journeyTemplate);
+  useEffect(() => {
+    setJourneyTemplate(props.journeyTemplate);
+  }, [props.journeyTemplate]);
 
   const [updateJourneyTemplateMutation] = useMutation(updateJourneyTemplate);
   const [deleteJourneyTemplateMutation] = useMutation(deleteJourneyTemplate);
 
-  async function updateField<Field extends keyof UpdateJourneyTemplate>(
+  function onChange<Field extends keyof UpdateJourneyTemplate>(
     field: Field,
     value: UpdateJourneyTemplate[Field],
   ) {
-    await updateJourneyTemplateMutation({ id: journeyTemplate.id, [field]: value });
+    setJourneyTemplate({ ...journeyTemplate, [field]: value });
+  }
+
+  async function updateField<Field extends keyof UpdateJourneyTemplate>(field: Field) {
+    await updateJourneyTemplateMutation({
+      id: journeyTemplate.id,
+      [field]: journeyTemplate[field],
+    });
   }
 
   return (
@@ -33,29 +43,33 @@ export function JourneyTemplateForm(props: JourneyTemplateFormProps & { style?: 
         label="Name"
         name="name"
         required
-        defaultValue={journeyTemplate.name}
-        onBlur={(event) => updateField("name", event.target.value)}
+        value={journeyTemplate.name}
+        onChange={(event) => onChange("name", event.currentTarget.value)}
+        onBlur={() => updateField("name")}
       />
       <TextInput
         label="Description"
         name="description"
         required
-        defaultValue={journeyTemplate.description}
-        onBlur={(event) => updateField("description", event.target.value)}
+        value={journeyTemplate.description}
+        onChange={(event) => onChange("description", event.currentTarget.value)}
+        onBlur={(event) => updateField("description")}
       />
       <TextInput
         label="To"
         name="to"
         required
-        defaultValue={journeyTemplate.to}
-        onBlur={(event) => updateField("to", event.target.value)}
+        value={journeyTemplate.to}
+        onChange={(event) => onChange("to", event.currentTarget.value)}
+        onBlur={() => updateField("to")}
       />
       <TextInput
         label="From"
         name="from"
         required
-        defaultValue={journeyTemplate.from}
-        onBlur={(event) => updateField("from", event.target.value)}
+        value={journeyTemplate.from}
+        onChange={(event) => onChange("from", event.currentTarget.value)}
+        onBlur={() => updateField("from")}
       />
       <NumberInput
         label="Distance"
@@ -64,13 +78,13 @@ export function JourneyTemplateForm(props: JourneyTemplateFormProps & { style?: 
         min={0}
         precision={1}
         step={0.1}
-        defaultValue={journeyTemplate.distance / 10}
-        onBlur={async (event) => {
-          const value = parseFloat(event.target.value);
-          if (!Number.isNaN(value)) {
-            await updateField("distance", Math.floor(value * 10));
+        value={journeyTemplate.distance / 10}
+        onChange={(value) => {
+          if (typeof value !== "undefined") {
+            onChange("distance", value * 10);
           }
         }}
+        onBlur={() => updateField("distance")}
       />
       <NumberInput
         label="Tolls"
@@ -80,13 +94,13 @@ export function JourneyTemplateForm(props: JourneyTemplateFormProps & { style?: 
         precision={2}
         step={0.01}
         icon={<FaIcon icon={faDollarSign} />}
-        defaultValue={journeyTemplate.tolls / 100}
-        onBlur={async (event) => {
-          const value = parseFloat(event.target.value);
-          if (!Number.isNaN(value)) {
-            await updateField("tolls", Math.floor(value * 100));
+        value={journeyTemplate.tolls / 100}
+        onChange={(value) => {
+          if (typeof value !== "undefined") {
+            onChange("tolls", value * 100);
           }
         }}
+        onBlur={() => updateField("tolls")}
       />
       <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
         <FaIcon

@@ -1,7 +1,7 @@
-import { ActionIcon, NumberInput, TextInput } from "@mantine/core";
-import { faDollarSign, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { ActionIcon, TextInput } from "@mantine/core";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaIcon } from "app/core/components/FaIcon";
-import { type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { UpdatePlace } from "../validators/update";
 import updatePlace from "../mutations/updatePlace";
 import { useMutation } from "@blitzjs/rpc";
@@ -15,16 +15,20 @@ export type PlaceFormProps = {
 };
 
 export function PlaceForm(props: PlaceFormProps & { style?: CSSProperties }) {
-  const { place: place } = props;
+  const [place, setPlace] = useState(props.place);
+  useEffect(() => {
+    setPlace(props.place);
+  }, [props.place]);
 
   const [updatePlaceMutation] = useMutation(updatePlace);
   const [deletePlaceMutation] = useMutation(deletePlace);
 
-  async function updateField<Field extends keyof UpdatePlace>(
-    field: Field,
-    value: UpdatePlace[Field],
-  ) {
-    await updatePlaceMutation({ id: place.id, [field]: value });
+  function onChange<Field extends keyof UpdatePlace>(field: Field, value: UpdatePlace[Field]) {
+    setPlace({ ...place, [field]: value });
+  }
+
+  async function updateField<Field extends keyof UpdatePlace>(field: Field) {
+    await updatePlaceMutation({ id: place.id, [field]: place[field] });
   }
 
   return (
@@ -33,16 +37,18 @@ export function PlaceForm(props: PlaceFormProps & { style?: CSSProperties }) {
         label="Name"
         name="name"
         required
-        defaultValue={place.name}
-        onBlur={(event) => updateField("name", event.target.value)}
+        value={place.name}
+        onChange={(event) => onChange("name", event.currentTarget.value)}
+        onBlur={() => updateField("name")}
         style={{ flex: 1 }}
       />
       <TextInput
         label="Address"
         name="address"
         required
-        defaultValue={place.address}
-        onBlur={(event) => updateField("address", event.target.value)}
+        value={place.address}
+        onChange={(event) => onChange("address", event.currentTarget.value)}
+        onBlur={() => updateField("address")}
         style={{ flex: 3 }}
       />
       <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>

@@ -1,14 +1,14 @@
 import { resolver } from "@blitzjs/rpc";
 import db from "db";
-import { z } from "zod";
+import { deletePlaceSchema } from "../validators/delete";
 
-const DeletePlace = z.object({
-  id: z.number(),
-});
+export default resolver.pipe(
+  resolver.zod(deletePlaceSchema),
+  resolver.authorize(),
+  async ({ id }) => {
+    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+    const place = await db.place.deleteMany({ where: { id } });
 
-export default resolver.pipe(resolver.zod(DeletePlace), resolver.authorize(), async ({ id }) => {
-  // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-  const place = await db.place.deleteMany({ where: { id } });
-
-  return place;
-});
+    return place;
+  },
+);

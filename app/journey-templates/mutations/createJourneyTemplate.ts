@@ -1,18 +1,9 @@
 import { resolver } from "@blitzjs/rpc";
 import db from "db";
-import { z } from "zod";
-
-const CreateJourneyTemplate = z.object({
-  name: z.string(),
-  description: z.string(),
-  from: z.string(),
-  to: z.string(),
-  distance: z.number().int().nonnegative(),
-  tolls: z.number().int().nonnegative(),
-});
+import { createJourneyTemplateSchema } from "../validators/create";
 
 export default resolver.pipe(
-  resolver.zod(CreateJourneyTemplate),
+  resolver.zod(createJourneyTemplateSchema),
   resolver.authorize(),
   async (input, ctx) => {
     // TODO: in multi-tenant app, you must add validation to ensure correct tenant

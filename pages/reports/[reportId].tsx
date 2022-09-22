@@ -9,39 +9,74 @@ import { useParam } from "@blitzjs/next";
 import Layout from "app/core/layouts/Layout";
 import getReport from "app/reports/queries/getReport";
 import deleteReport from "app/reports/mutations/deleteReport";
+import createJourney from "app/journeys/mutations/createJourney";
+import { FaIcon } from "app/core/components/FaIcon";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { ActionIcon, Button } from "@mantine/core";
+import { JourneyForm } from "app/journeys/components/JourneyForm";
 
 export const Report = () => {
   const router = useRouter();
   const reportId = useParam("reportId", "number");
+  const [createJourneyMutation] = useMutation(createJourney);
   const [deleteReportMutation] = useMutation(deleteReport);
-  const [report] = useQuery(getReport, { id: reportId });
+  const [report, { refetch }] = useQuery(getReport, { id: reportId });
+
+  async function addJourney() {
+    await createJourneyMutation({
+      date: new Date(),
+      description: "",
+      from: "",
+      to: "",
+      distance: 0,
+      tolls: 0,
+      reportId: reportId ?? 0,
+    });
+    await refetch();
+  }
 
   return (
     <>
       <Head>
-        <title>Report {report.id}</title>
+        <title>{report.name}</title>
       </Head>
 
-      <div>
-        <h1>Report {report.id}</h1>
-        <pre>{JSON.stringify(report, null, 2)}</pre>
+      <div style={{ display: "flex", gap: "0.5em", justifyContent: "center" }}>
+        <h1>{report.name}</h1>
 
-        <Link href={Routes.EditReportPage({ reportId: report.id })}>
-          <a>Edit</a>
-        </Link>
+        <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
+          <FaIcon
+            icon={faTrash}
+            size="lg"
+            onClick={async () => {
+              if (window.confirm("This will be deleted")) {
+                await deleteReportMutation({ id: report.id });
+                await router.push(Routes.ReportsPage());
+              }
+            }}
+          />
+        </ActionIcon>
+      </div>
 
-        <button
-          type="button"
-          onClick={async () => {
-            if (window.confirm("This will be deleted")) {
-              await deleteReportMutation({ id: report.id });
-              await router.push(Routes.ReportsPage());
-            }
-          }}
-          style={{ marginLeft: "0.5rem" }}
+      {report.journeys.map((journey) => (
+        <JourneyForm
+          key={journey.id}
+          journey={journey}
+          onDelete={() => refetch()}
+          style={{ marginBottom: "1em" }}
+        />
+      ))}
+
+      <div style={{ marginBottom: "1em" }}>
+        <Button
+          type="submit"
+          variant="filled"
+          color="green"
+          onClick={() => addJourney()}
+          style={{ alignSelf: "flex-end" }}
         >
-          Delete
-        </button>
+          Add journey
+        </Button>
       </div>
     </>
   );

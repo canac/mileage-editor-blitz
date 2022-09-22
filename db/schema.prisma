@@ -74,7 +74,7 @@ model Report {
   name      String
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId    Int
-  Journey   Journey[]
+  journeys  Journey[]
 }
 
 model Place {

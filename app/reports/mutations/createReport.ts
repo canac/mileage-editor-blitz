@@ -10,7 +10,6 @@ export default resolver.pipe(
   resolver.zod(CreateReport),
   resolver.authorize(),
   async (input, ctx) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
     const report = await db.report.create({ data: { ...input, userId: ctx.session.userId } });
 
     return report;

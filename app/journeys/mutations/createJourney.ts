@@ -2,7 +2,7 @@ import { resolver } from "@blitzjs/rpc";
 import db from "db";
 import { z } from "zod";
 
-const CreateJourney = z.object({
+export const createJourneySchema = z.object({
   date: z.date(),
   description: z.string(),
   from: z.string(),
@@ -11,14 +11,16 @@ const CreateJourney = z.object({
   tolls: z.number().int().nonnegative(),
   reportId: z.number().int().nonnegative(),
 });
+export type CreateJourneyInput = z.infer<typeof createJourneySchema>;
 
 export default resolver.pipe(
-  resolver.zod(CreateJourney),
+  resolver.zod(createJourneySchema),
   resolver.authorize(),
   async (input, ctx) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const journey = await db.journey.create({ data: input });
-
-    return journey;
+    // Make sure that the user owns the report
+    await db.report.findFirstOrThrow({
+      where: { id: input.reportId, userId: ctx.session.userId },
+    });
+    return db.journey.create({ data: input });
   },
 );

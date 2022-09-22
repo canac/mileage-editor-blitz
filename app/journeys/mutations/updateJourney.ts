@@ -1,22 +1,20 @@
 import { resolver } from "@blitzjs/rpc";
 import db from "db";
 import { z } from "zod";
+import { createJourneySchema } from "./createJourney";
 
-const UpdateJourney = z.object({
+export const updateJourneySchema = createJourneySchema.omit({ reportId: true }).partial().extend({
   id: z.number(),
-  name: z.string(),
 });
+export type UpdateJourneyInput = z.infer<typeof updateJourneySchema>;
 
 export default resolver.pipe(
-  resolver.zod(UpdateJourney),
+  resolver.zod(updateJourneySchema),
   resolver.authorize(),
   async ({ id, ...data }, ctx) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
-    const journey = await db.journey.updateMany({
-      where: { id, report: { userId: ctx.session.userId } },
-      data,
-    })[0];
-
-    return journey;
+    // Make sure that the user owns the report
+    const where = { id, report: { userId: ctx.session.userId } };
+    await db.journey.updateMany({ where, data });
+    return db.journey.findFirstOrThrow({ where });
   },
 );

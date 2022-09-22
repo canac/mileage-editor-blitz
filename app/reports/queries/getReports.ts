@@ -7,8 +7,9 @@ interface GetReportsInput
 
 export default resolver.pipe(
   resolver.authorize(),
-  async ({ where, orderBy, skip = 0, take = 100 }: GetReportsInput) => {
-    // TODO: in multi-tenant app, you must add validation to ensure correct tenant
+  async ({ where: rawWhere, orderBy, skip = 0, take = 100 }: GetReportsInput, ctx) => {
+    const where = { ...rawWhere, userId: ctx.session.userId };
+
     const {
       items: reports,
       hasMore,

@@ -14,12 +14,16 @@ import { FaIcon } from "app/core/components/FaIcon";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ActionIcon, Button } from "@mantine/core";
 import { JourneyForm } from "app/journeys/components/JourneyForm";
+import getPlaces from "app/places/queries/getPlaces";
+import getJourneyTemplates from "app/journey-templates/queries/getJourneyTemplates";
 
 export const Report = () => {
   const router = useRouter();
   const reportId = useParam("reportId", "number");
   const [createJourneyMutation] = useMutation(createJourney);
   const [deleteReportMutation] = useMutation(deleteReport);
+  const [{ places }] = useQuery(getPlaces, {});
+  const [{ journeyTemplates }] = useQuery(getJourneyTemplates, {});
   const [report, { refetch }] = useQuery(getReport, { id: reportId });
 
   async function addJourney() {
@@ -62,6 +66,8 @@ export const Report = () => {
         <JourneyForm
           key={journey.id}
           journey={journey}
+          places={places}
+          journeyTemplates={journeyTemplates}
           onDelete={() => refetch()}
           style={{ marginBottom: "1em" }}
         />

@@ -1,14 +1,16 @@
 import { ActionIcon, NumberInput, TextInput } from "@mantine/core";
 import { faDollarSign, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaIcon } from "app/core/components/FaIcon";
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import updateJourney, { UpdateJourneyInput } from "../mutations/updateJourney";
 import { useMutation } from "@blitzjs/rpc";
-import { Journey } from "@prisma/client";
+import { Journey, JourneyTemplate, Place } from "@prisma/client";
 import deleteJourney from "../mutations/deleteJourney";
 
 export type JourneyFormProps = {
   journey: Journey;
+  places: Place[];
+  journeyTemplates: JourneyTemplate[];
   onDelete?: (id: Journey["id"]) => void;
 };
 
@@ -21,14 +23,54 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
   const [updateJourneyMutation] = useMutation(updateJourney);
   const [deleteJourneyMutation] = useMutation(deleteJourney);
 
+  const places = useMemo(
+    () => new Map(props.places.map((place) => [place.name.toLowerCase(), place.address])),
+    [props.places],
+  );
+  const templates = useMemo(
+    () =>
+      new Map(props.journeyTemplates.map((template) => [template.name.toLowerCase(), template])),
+    [props.journeyTemplates],
+  );
+
   function onChange<Field extends keyof UpdateJourneyInput>(
     field: Field,
-    value: UpdateJourneyInput[Field],
+    value: Required<UpdateJourneyInput>[Field],
   ) {
     setJourney({ ...journey, [field]: value });
   }
 
+  // Expand the address into a place's address if possible, otherwise return the address unchanged
+  function expandAddress(address: string): string {
+    return places.get(address.toLowerCase()) ?? address;
+  }
+
   async function updateField<Field extends keyof UpdateJourneyInput>(field: Field) {
+    // Expand the description into a journey template if possible
+    if (field === "description") {
+      const template = templates.get(journey.description.toLowerCase());
+      if (template) {
+        const updatedFields = {
+          description: template.description,
+          from: template.from,
+          to: template.to,
+          distance: template.distance,
+          tolls: template.tolls,
+        };
+
+        setJourney({
+          ...journey,
+          ...updatedFields,
+        });
+
+        await updateJourneyMutation({
+          id: journey.id,
+          ...updatedFields,
+        });
+        return;
+      }
+    }
+
     await updateJourneyMutation({
       id: journey.id,
       [field]: journey[field],
@@ -50,7 +92,7 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
         name="to"
         required
         value={journey.to}
-        onChange={(event) => onChange("to", event.currentTarget.value)}
+        onChange={(event) => onChange("to", expandAddress(event.currentTarget.value))}
         onBlur={() => updateField("to")}
       />
       <TextInput
@@ -58,7 +100,7 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
         name="from"
         required
         value={journey.from}
-        onChange={(event) => onChange("from", event.currentTarget.value)}
+        onChange={(event) => onChange("from", expandAddress(event.currentTarget.value))}
         onBlur={() => updateField("from")}
       />
       <NumberInput

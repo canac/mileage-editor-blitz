@@ -12,7 +12,7 @@ import deleteReport from "app/reports/mutations/deleteReport";
 import createJourney from "app/journeys/mutations/createJourney";
 import { FaIcon } from "app/core/components/FaIcon";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
-import { ActionIcon, Button } from "@mantine/core";
+import { ActionIcon, Button, Title } from "@mantine/core";
 import { JourneyForm } from "app/journeys/components/JourneyForm";
 import getPlaces from "app/places/queries/getPlaces";
 import getJourneyTemplates from "app/journey-templates/queries/getJourneyTemplates";
@@ -45,8 +45,8 @@ export const Report = () => {
         <title>{report.name}</title>
       </Head>
 
-      <div style={{ display: "flex", gap: "0.5em", justifyContent: "center" }}>
-        <h1>{report.name}</h1>
+      <div style={{ display: "flex", gap: "0.5em", justifyContent: "center", marginBottom: "1em" }}>
+        <Title order={1}>{report.name}</Title>
 
         <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
           <FaIcon

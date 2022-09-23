@@ -45,35 +45,38 @@ export const Report = () => {
         <title>{report.name}</title>
       </Head>
 
-      <div style={{ display: "flex", gap: "0.5em", justifyContent: "center", marginBottom: "1em" }}>
-        <Title order={1}>{report.name}</Title>
+      <main style={{ margin: "1em" }}>
+        <Title
+          order={1}
+          style={{ display: "flex", gap: "0.5em", justifyContent: "center", marginBottom: "1em" }}
+        >
+          {report.name}
 
-        <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
-          <FaIcon
-            icon={faTrash}
-            size="lg"
-            onClick={async () => {
-              if (window.confirm("This will be deleted")) {
-                await deleteReportMutation({ id: report.id });
-                await router.push(Routes.ReportsPage());
-              }
-            }}
+          <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
+            <FaIcon
+              icon={faTrash}
+              size="lg"
+              onClick={async () => {
+                if (window.confirm("This will be deleted")) {
+                  await deleteReportMutation({ id: report.id });
+                  await router.push(Routes.ReportsPage());
+                }
+              }}
+            />
+          </ActionIcon>
+        </Title>
+
+        {report.journeys.map((journey) => (
+          <JourneyForm
+            key={journey.id}
+            journey={journey}
+            places={places}
+            journeyTemplates={journeyTemplates}
+            onChange={() => refetch()}
+            style={{ marginBottom: "1em" }}
           />
-        </ActionIcon>
-      </div>
+        ))}
 
-      {report.journeys.map((journey) => (
-        <JourneyForm
-          key={journey.id}
-          journey={journey}
-          places={places}
-          journeyTemplates={journeyTemplates}
-          onChange={() => refetch()}
-          style={{ marginBottom: "1em" }}
-        />
-      ))}
-
-      <div style={{ marginBottom: "1em" }}>
         <Button
           type="submit"
           variant="filled"
@@ -83,7 +86,7 @@ export const Report = () => {
         >
           Add journey
         </Button>
-      </div>
+      </main>
     </>
   );
 };

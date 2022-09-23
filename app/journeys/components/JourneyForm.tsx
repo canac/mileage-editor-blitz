@@ -7,6 +7,7 @@ import updateJourney, { UpdateJourneyInput } from "../mutations/updateJourney";
 import deleteJourney from "../mutations/deleteJourney";
 import { useMutation } from "@blitzjs/rpc";
 import { Journey, JourneyTemplate, Place } from "@prisma/client";
+import { AddressInput } from "app/core/components/AddressInput";
 
 export type JourneyFormProps = {
   journey: Journey;
@@ -83,7 +84,6 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
     <div className="form" style={{ display: "flex", gap: "1em", ...props.style }}>
       <TextInput
         label="Date"
-        name="date"
         type="date"
         required
         value={journey.date}
@@ -92,38 +92,34 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
       />
       <TextInput
         label="Description"
-        name="description"
         required
         value={journey.description}
         onChange={(event) => onChange("description", event.currentTarget.value)}
         onBlur={() => updateField("description")}
         style={{ flex: 1 }}
       />
-      <TextInput
+      <AddressInput
         label="From"
-        name="from"
         required
         value={journey.from}
-        onChange={(event) => onChange("from", expandAddress(event.currentTarget.value))}
+        onChange={(value) => onChange("from", expandAddress(value))}
         onBlur={() => updateField("from")}
         style={{ flex: 1 }}
       />
-      <TextInput
+      <AddressInput
         label="To"
-        name="to"
         required
         value={journey.to}
-        onChange={(event) => onChange("to", expandAddress(event.currentTarget.value))}
+        onChange={(value) => onChange("to", expandAddress(value))}
         onBlur={() => updateField("to")}
         style={{ flex: 1 }}
       />
       <NumberInput
         label="Distance"
-        name="distance"
         required
         min={0}
         precision={1}
-        step={0.1}
+        hideControls
         value={journey.distance / 10}
         onChange={(value) => {
           if (typeof value !== "undefined") {
@@ -135,11 +131,10 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
       />
       <NumberInput
         label="Tolls"
-        name="tolls"
         required
         min={0}
         precision={2}
-        step={0.01}
+        hideControls
         icon={<FaIcon icon={faDollarSign} />}
         value={journey.tolls / 100}
         onChange={(value) => {

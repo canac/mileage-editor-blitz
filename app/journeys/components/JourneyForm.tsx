@@ -88,20 +88,20 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
         onBlur={() => updateField("description")}
       />
       <TextInput
-        label="To"
-        name="to"
-        required
-        value={journey.to}
-        onChange={(event) => onChange("to", expandAddress(event.currentTarget.value))}
-        onBlur={() => updateField("to")}
-      />
-      <TextInput
         label="From"
         name="from"
         required
         value={journey.from}
         onChange={(event) => onChange("from", expandAddress(event.currentTarget.value))}
         onBlur={() => updateField("from")}
+      />
+      <TextInput
+        label="To"
+        name="to"
+        required
+        value={journey.to}
+        onChange={(event) => onChange("to", expandAddress(event.currentTarget.value))}
+        onBlur={() => updateField("to")}
       />
       <NumberInput
         label="Distance"

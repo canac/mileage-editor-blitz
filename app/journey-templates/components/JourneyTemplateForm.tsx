@@ -56,20 +56,20 @@ export function JourneyTemplateForm(props: JourneyTemplateFormProps & { style?: 
         onBlur={(event) => updateField("description")}
       />
       <TextInput
-        label="To"
-        name="to"
-        required
-        value={journeyTemplate.to}
-        onChange={(event) => onChange("to", event.currentTarget.value)}
-        onBlur={() => updateField("to")}
-      />
-      <TextInput
         label="From"
         name="from"
         required
         value={journeyTemplate.from}
         onChange={(event) => onChange("from", event.currentTarget.value)}
         onBlur={() => updateField("from")}
+      />
+      <TextInput
+        label="To"
+        name="to"
+        required
+        value={journeyTemplate.to}
+        onChange={(event) => onChange("to", event.currentTarget.value)}
+        onBlur={() => updateField("to")}
       />
       <NumberInput
         label="Distance"

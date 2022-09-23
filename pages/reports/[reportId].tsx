@@ -28,7 +28,7 @@ export const Report = () => {
 
   async function addJourney() {
     await createJourneyMutation({
-      date: new Date(),
+      date: new Date().toISOString().slice(0, 10), // today
       description: "",
       from: "",
       to: "",

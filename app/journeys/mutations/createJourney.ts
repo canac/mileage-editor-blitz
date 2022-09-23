@@ -3,7 +3,7 @@ import db from "db";
 import { z } from "zod";
 
 export const createJourneySchema = z.object({
-  date: z.date(),
+  date: z.string(),
   description: z.string(),
   from: z.string(),
   to: z.string(),

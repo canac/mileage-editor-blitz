@@ -105,7 +105,7 @@ model Journey {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  date        DateTime
+  date        String
   description String
   from        String
   to          String

@@ -80,6 +80,15 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
   return (
     <div className="form" style={{ display: "flex", gap: "1em", ...props.style }}>
       <TextInput
+        label="Date"
+        name="date"
+        type="date"
+        required
+        value={journey.date}
+        onChange={(event) => onChange("date", event.currentTarget.value)}
+        onBlur={() => updateField("date")}
+      />
+      <TextInput
         label="Description"
         name="description"
         required

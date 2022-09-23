@@ -68,7 +68,7 @@ export const Report = () => {
           journey={journey}
           places={places}
           journeyTemplates={journeyTemplates}
-          onDelete={() => refetch()}
+          onChange={() => refetch()}
           style={{ marginBottom: "1em" }}
         />
       ))}

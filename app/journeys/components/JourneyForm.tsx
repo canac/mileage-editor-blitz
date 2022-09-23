@@ -1,17 +1,18 @@
 import { ActionIcon, NumberInput, TextInput } from "@mantine/core";
-import { faDollarSign, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faDollarSign, faHome, faRoute, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FaIcon } from "app/core/components/FaIcon";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import createJourney from "../mutations/createJourney";
 import updateJourney, { UpdateJourneyInput } from "../mutations/updateJourney";
+import deleteJourney from "../mutations/deleteJourney";
 import { useMutation } from "@blitzjs/rpc";
 import { Journey, JourneyTemplate, Place } from "@prisma/client";
-import deleteJourney from "../mutations/deleteJourney";
 
 export type JourneyFormProps = {
   journey: Journey;
   places: Place[];
   journeyTemplates: JourneyTemplate[];
-  onDelete?: (id: Journey["id"]) => void;
+  onChange?: () => void;
 };
 
 export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties }) {
@@ -20,6 +21,7 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
     setJourney(props.journey);
   }, [props.journey]);
 
+  const [createJourneyMutation] = useMutation(createJourney);
   const [updateJourneyMutation] = useMutation(updateJourney);
   const [deleteJourneyMutation] = useMutation(deleteJourney);
 
@@ -143,14 +145,68 @@ export function JourneyForm(props: JourneyFormProps & { style?: CSSProperties })
         }}
         onBlur={() => updateField("tolls")}
       />
+      <ActionIcon size="lg" style={{ alignSelf: "center" }}>
+        <FaIcon
+          icon={faCopy}
+          size="lg"
+          onClick={async () => {
+            const { date, description, from, to, distance, tolls, reportId } = journey;
+            await createJourneyMutation({
+              date,
+              description,
+              from,
+              to,
+              distance,
+              tolls,
+              reportId,
+            });
+            props.onChange?.();
+          }}
+        />
+      </ActionIcon>
+      <ActionIcon size="lg" style={{ alignSelf: "center" }}>
+        <FaIcon
+          icon={faRoute}
+          size="lg"
+          onClick={async () => {
+            await createJourneyMutation({
+              date: journey.date,
+              description: "",
+              from: journey.to,
+              to: "",
+              distance: 0,
+              tolls: 0,
+              reportId: journey.reportId,
+            });
+            props.onChange?.();
+          }}
+        />
+      </ActionIcon>
+      <ActionIcon size="lg" style={{ alignSelf: "center" }}>
+        <FaIcon
+          icon={faHome}
+          size="lg"
+          onClick={async () => {
+            await createJourneyMutation({
+              date: journey.date,
+              description: journey.description,
+              from: journey.to,
+              to: expandAddress("home"),
+              distance: 0,
+              tolls: 0,
+              reportId: journey.reportId,
+            });
+            props.onChange?.();
+          }}
+        />
+      </ActionIcon>
       <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
         <FaIcon
           icon={faTrash}
           size="lg"
           onClick={async () => {
-            const { id } = journey;
-            await deleteJourneyMutation({ id });
-            props.onDelete?.(id);
+            await deleteJourneyMutation({ id: journey.id });
+            props.onChange?.();
           }}
         />
       </ActionIcon>

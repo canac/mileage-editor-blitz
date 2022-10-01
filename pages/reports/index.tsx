@@ -6,6 +6,7 @@ import { usePaginatedQuery } from "@blitzjs/rpc";
 import { useRouter } from "next/router";
 import Layout from "app/core/layouts/Layout";
 import getReports from "app/reports/queries/getReports";
+import { Button, Title } from "@mantine/core";
 
 const ITEMS_PER_PAGE = 100;
 
@@ -23,11 +24,16 @@ export const ReportsList = () => {
 
   return (
     <div>
+      <Title order={1}>Reports</Title>
+
       <ul>
         {reports.map((report) => (
           <li key={report.id}>
             <Link href={Routes.ShowReportPage({ reportId: report.id })}>
-              <a>{report.name}</a>
+              <a>
+                {report.name} ({report.createdAt.getMonth() + 1}-{report.createdAt.getDate()}-
+                {report.createdAt.getFullYear()})
+              </a>
             </Link>
           </li>
         ))}
@@ -51,15 +57,15 @@ const ReportsPage = () => {
       </Head>
 
       <div>
-        <p>
-          <Link href={Routes.NewReportPage()}>
-            <a>Create Report</a>
-          </Link>
-        </p>
-
         <Suspense fallback={<div>Loading...</div>}>
           <ReportsList />
         </Suspense>
+
+        <Link href={Routes.NewReportPage()}>
+          <Button variant="filled" color="green" style={{ marginTop: "1em" }}>
+            New report
+          </Button>
+        </Link>
       </div>
     </Layout>
   );

@@ -78,7 +78,6 @@ export const Report = () => {
         ))}
 
         <Button
-          type="submit"
           variant="filled"
           color="green"
           onClick={() => addJourney()}

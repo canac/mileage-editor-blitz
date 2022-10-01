@@ -49,7 +49,6 @@ export const PlacesList = () => {
 
       <div style={{ marginBottom: "1em" }}>
         <Button
-          type="submit"
           variant="filled"
           color="green"
           onClick={() => addPlace()}

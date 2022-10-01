@@ -11,7 +11,7 @@ import getReport from "app/reports/queries/getReport";
 import deleteReport from "app/reports/mutations/deleteReport";
 import createJourney from "app/journeys/mutations/createJourney";
 import { FaIcon } from "app/core/components/FaIcon";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { ActionIcon, Button, Title } from "@mantine/core";
 import { JourneyForm } from "app/journeys/components/JourneyForm";
 import getPlaces from "app/places/queries/getPlaces";
@@ -51,6 +51,12 @@ export const Report = () => {
           style={{ display: "flex", gap: "0.5em", justifyContent: "center", marginBottom: "1em" }}
         >
           {report.name}
+
+          <Link href={Routes.PrintReportPage({ reportId: reportId?.toString() ?? "" })}>
+            <ActionIcon size="lg" style={{ alignSelf: "center" }}>
+              <FaIcon icon={faPrint} size="lg" />
+            </ActionIcon>
+          </Link>
 
           <ActionIcon color="red" size="lg" style={{ alignSelf: "center" }}>
             <FaIcon
